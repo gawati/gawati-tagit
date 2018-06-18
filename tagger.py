@@ -17,53 +17,59 @@ raw_corpus = ["Human machine interface for lab abc computer applications",
 # PREPARE CORPUS
 # Create a set of frequent words
 stoplist = set('for a of the and to in'.split(' '))
-# Lowercase each document, split it by white space and filter out stopwords
-texts = [[word for word in document.lower().split() if word not in stoplist]
-         for document in raw_corpus]
 
-# Count word frequencies
-from collections import defaultdict
-frequency = defaultdict(int)
-for text in texts:
-    for token in text:
-        frequency[token] += 1
+def prepare_corpus():
+  # Lowercase each document, split it by white space and filter out stopwords
+  texts = [[word for word in document.lower().split() if word not in stoplist]
+          for document in raw_corpus]
 
-# Only keep words that appear more than once
-processed_corpus = [[token for token in text if frequency[token] > 1] for text in texts]
-processed_corpus
+  # Count word frequencies
+  from collections import defaultdict
+  frequency = defaultdict(int)
+  for text in texts:
+      for token in text:
+          frequency[token] += 1
 
-from gensim import corpora
-dictionary = corpora.Dictionary(processed_corpus)
+  # Only keep words that appear more than once
+  processed_corpus = [[token for token in text if frequency[token] > 1] for text in texts]
+  return processed_corpus
 
-# Print tokens with ID
-print("\n Vocabulary: \n", dictionary.token2id)
+def train():
+  processed_corpus = prepare_corpus()
 
-# CREATE VECTORS
-# Convert corpus to list of vectors
-bow_corpus = [dictionary.doc2bow(text) for text in processed_corpus]
-print("\n Document Vectors: \n", bow_corpus)
+  # Prepare Vocabulary
+  from gensim import corpora
+  dictionary = corpora.Dictionary(processed_corpus)
+  # Print tokens with ID
+  print("\n Vocabulary: \n", dictionary.token2id)
 
+  # Create Vectors.
+  bow_corpus = [dictionary.doc2bow(text) for text in processed_corpus]
+  print("\n Document Vectors: \n", bow_corpus)
 
-# TRAIN MODEL
-from gensim import models
-# train the model
-tfidf = models.TfidfModel(bow_corpus)
+  # Train Model
+  from gensim import models
+  tfidf = models.TfidfModel(bow_corpus)
+  tfidf.save("tagit.model")
 
-# TEST NEW DOC
-new_doc = "the testing of system trees"
-print("\n Applying the tfidf model on a new doc string: \n `{0}`".format(new_doc))
-# remove stopwords
-new_doc_processed = [word for word in new_doc.lower().split() if word not in stoplist]
-# transform the `new_doc` by applying the above model
-new_doc_transformed = tfidf[dictionary.doc2bow(new_doc_processed)]
-print("\n Weighted vectors for the new doc: \n", new_doc_transformed)
+def test_doc():
+  # Test New Doc
+  new_doc = "the testing of system trees"
+  print("\n Applying the tfidf model on a new doc string: \n `{0}`".format(new_doc))
+  # remove stopwords
+  new_doc_processed = [word for word in new_doc.lower().split() if word not in stoplist]
 
-# Sort in descending order of weights
-from operator import itemgetter
-new_doc_sorted = sorted(new_doc_transformed, key=itemgetter(1), reverse=True)
+  tfidf_model = models.TfidfModel.load("tagit.model")
+  # transform the `new_doc` by applying the above model
+  new_doc_transformed = tfidf_model[dictionary.doc2bow(new_doc_processed)]
+  print("\n Weighted vectors for the new doc: \n", new_doc_transformed)
 
-# Print the tokens of `new_doc` in descending order of weights  
-id_tokens = dictionary.token2id
-print("\n Tags for new doc in descending order of weights:")
-for i,j in new_doc_sorted:
-  print(" ", list(id_tokens.keys())[list(id_tokens.values()).index(i)])
+  # Sort in descending order of weights
+  from operator import itemgetter
+  new_doc_sorted = sorted(new_doc_transformed, key=itemgetter(1), reverse=True)
+
+  # Print the tokens of `new_doc` in descending order of weights  
+  id_tokens = dictionary.token2id
+  print("\n Tags for new doc in descending order of weights:")
+  for i,j in new_doc_sorted:
+    print(" ", list(id_tokens.keys())[list(id_tokens.values()).index(i)])
