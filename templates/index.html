@@ -1,8 +1,21 @@
-<html>
-    <head>
-        <title>Automatic Document Tagging Service</title>
-    </head>
-    <body>
-        <h1>{{ greeting }}</h1>
-    </body>
-</html>
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+
+  <div class="panel panel-default">
+    <div class="panel-body">Tagger Spec</div>
+  </div>
+
+  <div class="panel panel-primary">
+    <div class="panel-heading">Tag Document</div>
+    <div class="panel-body">Upload new document to be tagged:
+      <label class="custom-file">
+        <input type="file" id="file" class="custom-file-input">
+        <span class="custom-file-control"></span>
+      </label>
+    </div>
+  </div>
+  
+</div>
+{% endblock %}
