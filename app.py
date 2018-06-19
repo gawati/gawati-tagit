@@ -2,6 +2,7 @@ from flask import Flask, render_template, jsonify, request
 from flask_bootstrap import Bootstrap
 import os
 from werkzeug.utils import secure_filename
+from tagger import tag_doc
 
 app = Flask(__name__)
 bootstrap = Bootstrap(app)
@@ -28,8 +29,10 @@ def get_tags():
 
   if allowed_file(file.filename):
     filename = secure_filename(file.filename)
-    file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-    return render_template('index.html', filename=filename)
+    filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    file.save(filepath)
+    tags = tag_doc(filepath)
+    return render_template('index.html', tags=tags)
   else:
     return render_template('index.html', error="File type not allowed")
 
