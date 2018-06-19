@@ -9,11 +9,21 @@
 
   <div class="panel panel-primary">
     <div class="panel-heading">Tag Document</div>
-    <div class="panel-body">Upload new document to be tagged:
-      <label class="custom-file">
-        <input type="file" id="file" class="custom-file-input">
-        <span class="custom-file-control"></span>
-      </label>
+    <div class="panel-body">
+      <form method="POST" action="/tag" enctype="multipart/form-data">
+        <input type=file name=file>
+        <br />
+        <input class="btn btn-primary" type="submit" value="Tag">
+      </form>
+      <br />
+
+      {% if filename %}
+        <div class="alert alert-success"><strong>Tags:</strong> {{ filename }}</div>
+      {% endif %}
+
+      {% if error %}
+        <div class="alert alert-danger"><strong>Oh snap!</strong> {{ error }}</div>
+      {% endif %}
     </div>
   </div>
   
