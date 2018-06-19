@@ -1,40 +1,41 @@
 #!/usr/bin/env python3
-# Generates tags for a document using tf-idf (term frequency - inverse document frequency) model
+# Tool to:
+# a. Bulk convert xml contents to clean text
+# b. Train a tf-idf (term frequency - inverse document frequency) model with the given corpus
+# c. Generate tags for a given document
 # Ignores words not present in the trained vocab dictionary.
+# To-Do: 
+# a. Update vocab for a new doc
+# b. Bigger list of stopwords
 
-from sys import argv
+
 import argparse
 import glob
 import os
 import subprocess
+from sys import argv
+from gensim import models, corpora
+from collections import defaultdict
 
-# DATA / DOCUMENTS
-raw_corpus = ["Human machine interface for lab abc computer applications",
-             "A survey of user opinion of computer system response time",
-             "The EPS user interface management system",
-             "System and human system engineering testing of EPS",              
-             "Relation of user perceived response time to error measurement",
-             "The generation of random binary unordered trees",
-             "The intersection graph of paths in trees",
-             "Graph minors IV Widths of trees and well quasi ordering",
-             "Graph minors A survey"]
-
-
-# PREPARE CORPUS
-# Create a set of frequent words
+data_text_dir = 'data/akn_text'
 stoplist = set('for a of the and to in'.split(' '))
 
-def prepare_corpus():
-  # Lowercase each document, split it by white space and filter out stopwords
-  texts = [[word for word in document.lower().split() if word not in stoplist]
-          for document in raw_corpus]
+def prune_stopwords(doc):
+  return [word for word in doc.lower().split() if word not in stoplist]
 
-  # Count word frequencies
-  from collections import defaultdict
+def prepare_corpus():
+  raw_corpus = []
+  for file in glob.glob(data_text_dir+'/**/*', recursive=True):
+    with open(file, 'r') as f:
+      raw_corpus.append(f.read())
+  
+  texts = [prune_stopwords(document) for document in raw_corpus]
+  
+  # Count word frequencies across all documents
   frequency = defaultdict(int)
   for text in texts:
-      for token in text:
-          frequency[token] += 1
+    for token in text:
+      frequency[token] += 1
 
   # Only keep words that appear more than once
   processed_corpus = [[token for token in text if frequency[token] > 1] for text in texts]
@@ -44,44 +45,48 @@ def train():
   processed_corpus = prepare_corpus()
 
   # Prepare Vocabulary
-  from gensim import corpora
   dictionary = corpora.Dictionary(processed_corpus)
+  dictionary.save('tagit.dict')
   # Print tokens with ID
-  print("\n Vocabulary: \n", dictionary.token2id)
+  # print("\n Vocabulary: \n", dictionary.token2id)
 
   # Create Vectors.
   bow_corpus = [dictionary.doc2bow(text) for text in processed_corpus]
-  print("\n Document Vectors: \n", bow_corpus)
+  # print("\n Document Vectors: \n", bow_corpus)
 
-  # Train Model
-  from gensim import models
+  # Train Model  
   tfidf = models.TfidfModel(bow_corpus)
   tfidf.save("tagit.model")
 
-def test_doc():
-  # Test New Doc
-  new_doc = "the testing of system trees"
-  print("\n Applying the tfidf model on a new doc string: \n `{0}`".format(new_doc))
-  # remove stopwords
-  new_doc_processed = [word for word in new_doc.lower().split() if word not in stoplist]
+def tag_doc(ip_file):
+  op_tmp = 'op_tmp'
+  # Convert xml to clean text
+  with open(op_tmp, 'w') as f:
+      subprocess.check_call(['perl', 'xml2txt.pl', ip_file], stdout=f)
 
-  tfidf_model = models.TfidfModel.load("tagit.model")
+  with open(op_tmp, 'r') as f:
+    new_doc = f.read()
+
+  new_doc_processed = prune_stopwords(new_doc)
+  tagit_model = models.TfidfModel.load("tagit.model")
+  tagit_dict = corpora.Dictionary.load("tagit.dict")
   # transform the `new_doc` by applying the above model
-  new_doc_transformed = tfidf_model[dictionary.doc2bow(new_doc_processed)]
-  print("\n Weighted vectors for the new doc: \n", new_doc_transformed)
+  new_doc_transformed = tagit_model[tagit_dict.doc2bow(new_doc_processed)]
+  # print("\n Weighted vectors for the new doc: \n", new_doc_transformed)
 
   # Sort in descending order of weights
   from operator import itemgetter
   new_doc_sorted = sorted(new_doc_transformed, key=itemgetter(1), reverse=True)
 
-  # Print the tokens of `new_doc` in descending order of weights  
-  id_tokens = dictionary.token2id
-  print("\n Tags for new doc in descending order of weights:")
+  # Tokens of `new_doc` in descending order of weights  
+  id_tokens = tagit_dict.token2id
+  tags = []
   for i,j in new_doc_sorted:
-    print(" ", list(id_tokens.keys())[list(id_tokens.values()).index(i)])
+    word = list(id_tokens.keys())[list(id_tokens.values()).index(i)]
+    tags.append(word)
+  return tags[:10]
 
 def xml2txt(ip_dir):
-  data_text_dir = 'data/akn_text'
   # Remove old files
   for file in glob.glob(data_text_dir+'/*'):
     os.remove(file)
@@ -102,25 +107,27 @@ def main():
   parser = argparse.ArgumentParser(description='Tool to train tf-idf model')
   parser.add_argument('--convert', dest="xml_dir",
                       help="Input XML data folder to convert to text", metavar="CONVERT", type=lambda x: is_valid_dir(parser, x))
-  parser.add_argument('--train', dest="corpus", help="Train model",
-                      metavar="TRAIN", type=lambda x: is_valid_dir(parser, x))
+  parser.add_argument('--train', help="Train model",
+                      dest="train", action='store_true')
   parser.add_argument('--tag', dest="doc",
                       help="Input document to tag", metavar="TAG",
                       type=lambda x: is_valid_dir(parser, x))
   args = parser.parse_args()
 
-  if len(argv) != 3:
+  if len(argv) < 2:
     parser.print_help()
 
   if args.xml_dir:
     print("Converting xml to clean text")
     xml2txt(args.xml_dir)
 
-  if args.corpus:
-    print("Training tf-idf model with corpus {0}".format(args.corpus))
+  if args.train:
+    print("Training tf-idf model with corpus {0}".format(data_text_dir))
+    train()
 
   if args.doc:
     print("Inferring tags for document {0}".format(args.doc))
+    print(tag_doc(args.doc))
 
 if __name__== "__main__":
   main()
