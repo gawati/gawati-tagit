@@ -1,5 +1,6 @@
 ## Dependencies
 Python3
+Perl
 
 ## Install
 ```
