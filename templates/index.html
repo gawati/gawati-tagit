@@ -2,11 +2,6 @@
 
 {% block content %}
 <div class="container">
-
-  <div class="panel panel-default">
-    <div class="panel-body">Tagger Spec</div>
-  </div>
-
   <div class="panel panel-primary">
     <div class="panel-heading">Tag Document</div>
     <div class="panel-body">
@@ -17,15 +12,14 @@
       </form>
       <br />
 
-      {% if filename %}
-        <div class="alert alert-success"><strong>Tags:</strong> {{ filename }}</div>
+      {% if tags %}
+        <div class="alert alert-success tags"><strong>Tags:</strong> {{ tags }}</div>
       {% endif %}
 
       {% if error %}
-        <div class="alert alert-danger"><strong>Oh snap!</strong> {{ error }}</div>
+        <div class="alert alert-danger tags"><strong>Oh snap!</strong> {{ error }}</div>
       {% endif %}
     </div>
   </div>
-  
 </div>
 {% endblock %}
