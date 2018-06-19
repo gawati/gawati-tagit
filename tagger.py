@@ -2,6 +2,12 @@
 # Generates tags for a document using tf-idf (term frequency - inverse document frequency) model
 # Ignores words not present in the trained vocab dictionary.
 
+from sys import argv
+import argparse
+import glob
+import os
+import subprocess
+
 # DATA / DOCUMENTS
 raw_corpus = ["Human machine interface for lab abc computer applications",
              "A survey of user opinion of computer system response time",
@@ -73,3 +79,48 @@ def test_doc():
   print("\n Tags for new doc in descending order of weights:")
   for i,j in new_doc_sorted:
     print(" ", list(id_tokens.keys())[list(id_tokens.values()).index(i)])
+
+def xml2txt(ip_dir):
+  data_text_dir = 'data/akn_text'
+  # Remove old files
+  for file in glob.glob(data_text_dir+'/*'):
+    os.remove(file)
+  # Extract clean text from xml
+  for i, ip_file in enumerate(glob.glob(ip_dir+'/**/*', recursive=True)):
+    print(ip_file)
+    op_file = data_text_dir + '/fil' + str(i)
+    with open(op_file, 'w') as f:
+      subprocess.check_call(['perl', 'xml2txt.pl', ip_file], stdout=f)
+
+def is_valid_dir(parser, arg):
+  if not os.path.exists(arg):
+    parser.error("The dir %s does not exist!" % arg)
+  else:
+    return arg
+
+def main():
+  parser = argparse.ArgumentParser(description='Tool to train tf-idf model')
+  parser.add_argument('--convert', dest="xml_dir",
+                      help="Input XML data folder to convert to text", metavar="CONVERT", type=lambda x: is_valid_dir(parser, x))
+  parser.add_argument('--train', dest="corpus", help="Train model",
+                      metavar="TRAIN", type=lambda x: is_valid_dir(parser, x))
+  parser.add_argument('--tag', dest="doc",
+                      help="Input document to tag", metavar="TAG",
+                      type=lambda x: is_valid_dir(parser, x))
+  args = parser.parse_args()
+
+  if len(argv) != 3:
+    parser.print_help()
+
+  if args.xml_dir:
+    print("Converting xml to clean text")
+    xml2txt(args.xml_dir)
+
+  if args.corpus:
+    print("Training tf-idf model with corpus {0}".format(args.corpus))
+
+  if args.doc:
+    print("Inferring tags for document {0}".format(args.doc))
+
+if __name__== "__main__":
+  main()
