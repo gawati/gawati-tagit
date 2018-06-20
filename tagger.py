@@ -2,11 +2,7 @@
 # Tool to:
 # a. Bulk convert xml contents to clean text
 # b. Train a tf-idf (term frequency - inverse document frequency) model with the given corpus
-# c. Generate tags for a given document
-# Ignores words not present in the trained vocab dictionary.
-# To-Do: 
-# a. Update vocab for a new doc
-# b. Bigger list of stopwords
+# c. Generate tags for a given document. Updates dictionary with the new doc.
 
 
 import argparse
@@ -16,9 +12,10 @@ import subprocess
 from sys import argv
 from gensim import models, corpora
 from collections import defaultdict
+from stop_words import get_stop_words
 
 data_text_dir = 'data/akn_text'
-stoplist = set('for a of the and to in'.split(' '))
+stoplist = get_stop_words('en')
 
 def prune_stopwords(doc):
   return [word for word in doc.lower().split() if word not in stoplist]
