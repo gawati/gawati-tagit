@@ -70,8 +70,9 @@ def tag_doc(ip_file):
   new_doc_processed = prune_stopwords(new_doc)
   tagit_model = models.TfidfModel.load("tagit.model")
   tagit_dict = corpora.Dictionary.load("tagit.dict")
+
   # transform the `new_doc` by applying the above model
-  new_doc_transformed = tagit_model[tagit_dict.doc2bow(new_doc_processed)]
+  new_doc_transformed = tagit_model[tagit_dict.doc2bow(new_doc_processed, allow_update=True)]
   # print("\n Weighted vectors for the new doc: \n", new_doc_transformed)
 
   # Sort in descending order of weights
