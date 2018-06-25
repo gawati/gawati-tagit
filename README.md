@@ -18,7 +18,11 @@ Start Python3 prompt
 
 ## Run
 ```
-FLASK_APP=app.py flask run
+FLASK_APP=app.py flask run --port=5001
+```
+or
+```
+python app.py
 ```
 
 The flask app can be used to upload a document and generate tags for it. 
@@ -39,7 +43,7 @@ python tagger.py --help
 
 ## Tag Document API
 
-Request URL: http://localhost:5000/api/tag  
+Request URL: http://localhost:5001/api/tag  
 Method: POST  
 Content-Type: multipart/form-data  
 Request body: `file: <The binary data contents of the file>`  

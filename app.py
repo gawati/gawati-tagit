@@ -58,3 +58,6 @@ def tagit_api():
     return jsonify(error="File type not allowed"), 400
 
   return jsonify(), 204
+
+if __name__ == '__main__':
+    app.run(debug=False, port=5001)
