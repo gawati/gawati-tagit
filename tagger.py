@@ -57,9 +57,13 @@ def train():
 
 def tag_doc(ip_file):
   op_tmp = 'op_tmp'
-  # Convert xml to clean text
-  with open(op_tmp, 'w') as f:
-      subprocess.check_call(['perl', 'xml2txt.pl', ip_file], stdout=f)
+
+  if ip_file.split(".")[-1:] == ['txt']:
+    op_tmp = ip_file
+  else:
+    # Convert xml to clean text
+    with open(op_tmp, 'w') as f:
+        subprocess.check_call(['perl', 'xml2txt.pl', ip_file], stdout=f)
 
   with open(op_tmp, 'r') as f:
     new_doc = f.read()
