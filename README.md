@@ -64,4 +64,17 @@ A comparison of tf-idf, doc2vec and fasttext:
 
 5. fasttext has published pre-trained English word vectors and pre-trained models for 157 languages. Unclear how to use them.
 
-6. Need to verify how Gensim performs for other languages.  
+6. Need to verify how Gensim performs for other languages.
+
+## In the gawati-editor context
+The service would work as follows as part of the gawati-editor workflow:
+
+1. Create a new AKN document
+2. Add attachments
+3. For each attachment, click extract text. This converts pdf to fulltext.   
+Then, the above `/api/tag` API is called to generate tags for the attachment. These tags get saved in the respective fulltext file.
+4. When you refresh tags for the main AKN document:
+    - it gathers all the tags from the fulltext files of the attachments.
+    - it scans the main AKN metadata for all showAs text.
+    - all the showAs texts are prefixed to the list of tags.
+5. Note that we never run the main AKN metadata through this service.  
