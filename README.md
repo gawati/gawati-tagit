@@ -30,16 +30,19 @@ File types allowed: `.xml` and `.txt`.
 
 You may also use `tagger.py` to:
 
-1. Bulk convert xml files in a folder to clean text.
+1. Bulk convert xml files in a folder to clean text. The output clean text files get written to `data/akn_text`.
 2. Train a tf-idf (term frequency - inverse document frequency) model with the given corpus. This generates 
     - a dictionary of words (vocabulary) that gets saved as `tagit.dict`
-    - a model that gets saved as `tagit.model`
+    - a model that gets saved as `tagit.model`  
+Training assumes `data/akn_text` containing clean text files is present. 
 3. Generate tags for a given document using the above model. This also updates dictionary with the new doc.
 
 For instructions, run 
 ```
 python tagger.py --help
 ```
+
+**IMPORTANT**: If `tagit.model` isn't present, ensure you train one using the above script, before using the `/tag` API.  
 
 ## Tag Document API
 
