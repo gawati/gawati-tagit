@@ -4,7 +4,7 @@
 # letters (a-z, converted from A-Z), and spaces (never consecutive).  
 # All other characters are converted to spaces.  Only text which normally appears 
 # in the web browser is displayed.  Tables are removed.  Image captions are 
-# preserved.  Links are converted to normal text.  Digits are spelled out.
+# preserved.  Links are converted to normal text.
 
 # Originally written by Matt Mahoney, June 10, 2006.  This program is released to the public domain.
 
@@ -41,20 +41,20 @@ while (<>) {
     s/\]//g;
     s/&[^;]*;/ /g;          # remove URL encoded chars
 
-    # convert to lowercase letters and spaces, spell digits
+    # convert to lowercase letters and spaces
     $_=" $_ ";
     tr/A-Z/a-z/;
-    s/0/ zero /g;
-    s/1/ one /g;
-    s/2/ two /g;
-    s/3/ three /g;
-    s/4/ four /g;
-    s/5/ five /g;
-    s/6/ six /g;
-    s/7/ seven /g;
-    s/8/ eight /g;
-    s/9/ nine /g;
-    tr/a-z/ /cs;
+    # s/0/ zero /g;
+    # s/1/ one /g;
+    # s/2/ two /g;
+    # s/3/ three /g;
+    # s/4/ four /g;
+    # s/5/ five /g;
+    # s/6/ six /g;
+    # s/7/ seven /g;
+    # s/8/ eight /g;
+    # s/9/ nine /g;
+    tr/a-z0-9/ /cs;
     chop;
     print $_;
   }
