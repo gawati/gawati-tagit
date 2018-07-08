@@ -31,8 +31,11 @@ def tagit():
     filename = secure_filename(file.filename)
     filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
     file.save(filepath)
-    tags = tag_doc(filepath)
-    return render_template('index.html', tags=tags)
+    data = tag_doc(filepath)
+    if 'error' in data:
+      return render_template('index.html', error=data["error"])
+    else:
+      return render_template('index.html', tags=data["tags"])
   else:
     return render_template('index.html', error="File type not allowed")
 
@@ -52,8 +55,11 @@ def tagit_api():
     filename = secure_filename(file.filename)
     filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
     file.save(filepath)
-    tags = tag_doc(filepath)
-    return jsonify(tags=tags), 200
+    data = tag_doc(filepath)
+    if 'error' in data:
+      return jsonify(error=data["error"]), 500
+    else:
+      return jsonify(tags=data["tags"]), 200
   else:
     return jsonify(error="File type not allowed"), 400
 

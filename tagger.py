@@ -92,8 +92,12 @@ def tag_doc(ip_file):
     new_doc = f.read()
 
   new_doc_processed = prune_stopwords(new_doc, lang)
-  tagit_model = models.TfidfModel.load(get_model_name(lang))
-  tagit_dict = corpora.Dictionary.load(get_dict_name(lang))
+
+  try: 
+    tagit_model = models.TfidfModel.load(get_model_name(lang))
+    tagit_dict = corpora.Dictionary.load(get_dict_name(lang))
+  except FileNotFoundError:
+    return {'error': 'Language not supported'}
 
   # transform the `new_doc` by applying the above model
   new_doc_transformed = tagit_model[tagit_dict.doc2bow(new_doc_processed, allow_update=True)]
@@ -109,7 +113,7 @@ def tag_doc(ip_file):
   for i,j in new_doc_sorted:
     word = list(id_tokens.keys())[list(id_tokens.values()).index(i)]
     tags.append(word)
-  return tags[:10]
+  return {'tags': tags[:10]}
 
 def xml2txt(ip_dir):
   # Remove old files
