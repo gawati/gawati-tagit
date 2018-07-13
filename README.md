@@ -31,7 +31,7 @@ $ export FLASK_ENV=development
 Version is maintained in `tagit/setup.py`.  
 `python setup.py sdist` will create a development package with “.dev” and the current date appended.  
 `python setup.py release sdist` will create a release package with only the version.  
-To learn more the deploy process referenced, read [this](http://flask.pocoo.org/docs/1.0/patterns/distribute/)
+To learn more about the deploy process referenced, read [this](http://flask.pocoo.org/docs/1.0/patterns/distribute/)
 
 The flask app can be used to upload an AKN document and generate tags for it. 
 File types allowed: `.xml` and `.txt`.
