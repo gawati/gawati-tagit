@@ -1,13 +1,10 @@
-from flask import Flask, render_template, jsonify, request
-from flask_bootstrap import Bootstrap
+from flask import render_template, jsonify, request
 import os
+from tagit import app
 from werkzeug.utils import secure_filename
-from tagger import tag_doc
+from .tagger import tag_doc
 
-app = Flask(__name__)
-bootstrap = Bootstrap(app)
 app.config['UPLOAD_FOLDER'] = 'tmp/'
-
 ALLOWED_EXTENSIONS = set(['txt', 'xml'])
 
 def allowed_file(filename):

@@ -1,0 +1,9 @@
+recursive-include tagit/templates *
+recursive-include tagit/static *
+recursive-include data/akn_text *
+recursive-include stopwords *
+recursive-include tmp *
+include LICENSE
+include tagit.model.eng
+include tagit.dict.eng
+global-exclude *.pyc
