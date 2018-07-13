@@ -6,7 +6,7 @@ gawati-tagit is a tool to generate tags for a given AKN fulltext document.
 
 ## Install
 ```
-pip install -r requirements
+$ pip install -e .
 ``` 
 
 Start Python3 prompt
@@ -18,12 +18,20 @@ Start Python3 prompt
 
 ## Run
 ```
-FLASK_APP=app.py flask run --port=5001
+$ export FLASK_APP=tagit
+$ flask run --port=5001
 ```
-or
+
+To turn on development features, set the env variable before running.
 ```
-python app.py
+$ export FLASK_ENV=development
 ```
+
+## Build & Distribution
+Version is maintained in `tagit/setup.py`.  
+`python setup.py sdist` will create a development package with “.dev” and the current date appended.  
+`python setup.py release sdist` will create a release package with only the version.  
+To learn more the deploy process referenced, read [this](http://flask.pocoo.org/docs/1.0/patterns/distribute/)
 
 The flask app can be used to upload an AKN document and generate tags for it. 
 File types allowed: `.xml` and `.txt`.
@@ -46,7 +54,7 @@ Training assumes `data/akn_text` containing clean text files is present.
 
 For instructions, run 
 ```
-python tagger.py --help
+$ python -m tagit.tagger --help
 ```
 
 **IMPORTANT**: If `tagit.model.<lang>` isn't present, ensure you train one using the above script, before using the `/tag` API.  

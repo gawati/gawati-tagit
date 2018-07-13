@@ -1,0 +1,3 @@
+recursive-include tagit/templates *
+recursive-include tagit/static *
+global-exclude *.pyc
