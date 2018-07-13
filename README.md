@@ -5,6 +5,7 @@ gawati-tagit is a tool to generate tags for a given AKN fulltext document.
 - Perl
 
 ## Install
+Set up and activate a Python3 virtual environment.
 ```
 $ pip install -e .
 ``` 
