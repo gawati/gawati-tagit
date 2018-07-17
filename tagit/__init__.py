@@ -6,3 +6,6 @@ bootstrap = Bootstrap(app)
 app.config['UPLOAD_FOLDER'] = 'tmp/'
 
 import tagit.views
+
+if __name__ == "__main__":
+    app.run()
