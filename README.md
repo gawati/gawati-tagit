@@ -29,7 +29,7 @@ $ export FLASK_ENV=development
 ```
 
 ## Build & Distribution
-Version is maintained in `tagit/setup.py`.  
+Version is maintained in `setup.py`.  
 `python setup.py sdist` will create a development package with “.dev” and the current date appended.  
 `python setup.py release sdist` will create a release package with only the version.  
 To learn more about the deploy process referenced, read [this](http://flask.pocoo.org/docs/1.0/patterns/distribute/)
@@ -97,3 +97,28 @@ Then, the above `/api/tag` API is called to generate tags for the attachment. Th
     - it scans the main AKN metadata for all showAs text.
     - all the showAs texts are prefixed to the list of tags.
 5. Note that we never run the main AKN metadata through this service.  
+
+## Deploy
+Activate the Python3 virtual environment.
+
+1. Install gunicorn
+```
+$ pip install gunicorn
+```
+
+2. Set the log paths in `gunicorn.conf`
+
+3. Configure apache (apache.conf)
+```
+<Location "/path/to/gawati-tagit">
+    ProxyPass "http://127.0.0.1:5001/"
+    ProxyPassReverse "http://127.0.0.1:5001/"
+</Location>
+```
+
+4. Run gunicorn
+```
+$ gunicorn -c gunicorn.conf -b 0.0.0.5001 tagit:app
+```
+
+Check the app in the browser, http://your-ip-here/path/to/flaskapp  
